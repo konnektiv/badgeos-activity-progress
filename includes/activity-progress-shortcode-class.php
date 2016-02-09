@@ -100,7 +100,8 @@ class BadgeOS_Activity_Progress_Shortcode {
 
         $progress = ($points/$next_points * 100) . "%";
 
-       	return $this->wppb_get_progress_bar(false, false, $progress, false, $progress, true);
+       	return $this->wppb_get_progress_bar(false, false, $progress, false, $progress, true,
+											sprintf(__("%d/%d Points", 'badgeos-activity-progress'), $points, $next_points ));
     }
 
 	/**
@@ -111,6 +112,7 @@ class BadgeOS_Activity_Progress_Shortcode {
 	 * @param $text - any custom text (default: null)
 	 * @param $progress - the progress to display (required)
 	 * @param $option - any applicable options (default: null)
+	 * @param $title - custom title text (default: null)
 	 * @param $width - the width of the progress bar, based on $progress (required)
 	 * @param $color - custom color for the progress bar (default: null)
 	 * @param $gradient - custom gradient value, in decimals (default: null)
@@ -118,7 +120,7 @@ class BadgeOS_Activity_Progress_Shortcode {
 	 * @author Chris Reynolds
 	 * @since 2.0
 	 */
-	function wppb_get_progress_bar($location = false, $text = false, $progress, $option = false, $width, $fullwidth = false, $color = false, $gradient = false, $gradient_end = false) {
+	function wppb_get_progress_bar($location = false, $text = false, $progress, $option = false, $width, $fullwidth = false, $title = null, $color = false, $gradient = false, $gradient_end = false) {
 		/**
 		 * here's the html output of the progress bar
 		 */
@@ -126,7 +128,11 @@ class BadgeOS_Activity_Progress_Shortcode {
 		if ( $fullwidth ) {
 			$wppb_output .= " full";
 		}
-		$wppb_output .= "\">";
+		$wppb_output .= "\"";
+		if ( $title ) {
+			$wppb_output .= 'title="'.$title.'"';
+		}
+		$wppb_output .= ">";
 		if ( $location && $text) { // if $location is not empty and there's custom text, add this
 			$wppb_output .= "<div class=\"$location\">" . wp_kses($text, array()) . "</div>";
 		} elseif ( $location && !$text ) { // if the $location is set but there's no custom text
