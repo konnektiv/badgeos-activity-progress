@@ -96,7 +96,8 @@ class BadgeOS_Activity_Progress_Shortcode {
         $atts = shortcode_atts( array(
             'achievement_type'	=> badgeos_get_achievement_types_slugs(),    // achievement type to show progress for
 			'format'			=> 'simple',	// output format, possible values: 'simple', 'extended'
-			'user'				=> 0
+			'user'				=> 0,
+			'link_to'			=> false,
         ), $atts );
 
 		$points = absint(badgeos_get_users_points($atts['user']));
@@ -108,8 +109,15 @@ class BadgeOS_Activity_Progress_Shortcode {
 
         $progress = ($points/$level['next_points'] * 100) . "%";
 
-		$output = $this->wppb_get_progress_bar(false, false, $progress, false, $progress, true,
+		$output = '';
+		if ($atts['link_to'])
+			$output .= '<a href="' . $atts['link_to'] . '">';
+
+		$output .= $this->wppb_get_progress_bar(false, false, $progress, false, $progress, true,
 											   sprintf(__("%d/%d Points", 'badgeos-activity-progress'), $points, $level['next_points'] ));
+
+		if ($atts['link_to'])
+			$output .= '</a>';
 
 		if ($atts['format'] == 'extended') {
 			$progress = $output;
