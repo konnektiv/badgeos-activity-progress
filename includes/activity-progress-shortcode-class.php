@@ -113,8 +113,12 @@ class BadgeOS_Activity_Progress_Shortcode {
 		if ($atts['link_to'])
 			$output .= '<a href="' . $atts['link_to'] . '">';
 
-		$output .= $this->wppb_get_progress_bar(false, false, $progress, false, $progress, true,
-											   sprintf(__("%d/%d Points", 'badgeos-activity-progress'), $points, $level['next_points'] ));
+		$title = "";
+		if ($level['current_achievement'])
+			$title = get_the_title( $level['current_achievement'] ) . ": ";
+
+		$output .= $this->wppb_get_progress_bar(false, false, $progress, false, $progress, true,  $title .
+												sprintf(__("%d/%d Points", 'badgeos-activity-progress'), $points, $level['next_points'] ));
 
 		if ($atts['link_to'])
 			$output .= '</a>';
