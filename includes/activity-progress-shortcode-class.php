@@ -57,51 +57,77 @@ class BadgeOS_Activity_Progress_Shortcode {
 		add_shortcode( 'badgeos_activity_progress', array( $this, 'shortcode' ) );
 	}
 
-	function get_next_level_points($user_points, $achievement_type) {
-		$achievement_id = false;
+	function get_level_info($user_points, $achievement_type) {
+		$current_achievement = false;
+		$next_points = 0;
 		$current_points = 0;
-		$has_point_badges = false;
 
 		$achievements = get_posts(array(
 			'post_type' 		=> $achievement_type,
 			'posts_per_page'   	=> -1,
+			'meta_query'		=> array(
+				array(
+					'key'	=> '_badgeos_earned_by',
+					'value' =>  'points'
+				)
+			)
 		));
 
 		foreach($achievements as $achievement){
 
-			if ( 'points' == get_post_meta( $achievement->ID, '_badgeos_earned_by', true ) ) {
+			$points_required = absint( get_post_meta( $achievement->ID, '_badgeos_points_required', true ) );
 
-				$has_point_badges = true;
-				$points_required = absint( get_post_meta( $achievement->ID, '_badgeos_points_required', true ) );
-
-				if ( $points_required > $user_points && (!$current_points ||  $current_points > $points_required ) ) {
-					$current_points = $points_required;
-				}
+			if ( $points_required > $user_points && (!$next_points || $next_points > $points_required ) ) {
+				$next_points = $points_required;
+			} elseif ($points_required < $user_points && (!$current_points || $current_points < $points_required ) ) {
+				$current_points = $points_required;
+				$current_achievement = $achievement->ID;
 			}
+
 		}
 
-		if (!$current_points && $has_point_badges)
-			$current_points = $user_points;
-		return $current_points;
+		if (!$next_points && !empty($achievements))
+			$next_points = $user_points;
+		return array('next_points' => $next_points, 'current_achievement' => $current_achievement);
 	}
 
     public function shortcode($atts) {
 
         $atts = shortcode_atts( array(
             'achievement_type'	=> badgeos_get_achievement_types_slugs(),    // achievement type to show progress for
+			'format'			=> 'simple',	// output format, possible values: 'simple', 'extended'
+			'user'				=> 0
         ), $atts );
 
-		$points = absint(badgeos_get_users_points());
-		$next_points = $this->get_next_level_points($points, $atts['achievement_type']);
+		$points = absint(badgeos_get_users_points($atts['user']));
+		$level = $this->get_level_info($points, $atts['achievement_type']);
 
 		// no progress bar
-		if (!$next_points)
+		if (!$level['next_points'])
 			return '';
 
-        $progress = ($points/$next_points * 100) . "%";
+        $progress = ($points/$level['next_points'] * 100) . "%";
 
-       	return $this->wppb_get_progress_bar(false, false, $progress, false, $progress, true,
-											sprintf(__("%d/%d Points", 'badgeos-activity-progress'), $points, $next_points ));
+		$output = $this->wppb_get_progress_bar(false, false, $progress, false, $progress, true,
+											   sprintf(__("%d/%d Points", 'badgeos-activity-progress'), $points, $level['next_points'] ));
+
+		if ($atts['format'] == 'extended') {
+			$progress = $output;
+			$output = __('Current activity level:', 'badgeos-activity-progress');
+			if ($level['current_achievement']) {
+				$output .= '<div class="badgeos-badge-wrap">';
+				$output .= badgeos_get_achievement_post_thumbnail( $level['current_achievement'] );
+				$output .= '<span class="badgeos-title-wrap"><a href="' . get_permalink( $level['current_achievement'] ) . '">' .
+					get_the_title( $level['current_achievement'] ) . '</a></span>';
+				$output .= '</div>';
+			} else {
+				$output .= ' ' . __('No activity level reached.', 'badgeos-activity-progress') . '<br>';
+			}
+			$output .= '<p>' . sprintf(__("Activity points needed for next level: %d", 'badgeos-activity-progress'), $level['next_points'] ) . '</p>';
+			$output .= $progress;
+		}
+
+		return $output;
     }
 
 	/**
