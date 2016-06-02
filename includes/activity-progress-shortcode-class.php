@@ -30,7 +30,7 @@ class BadgeOS_Activity_Progress_Shortcode {
 	public static function instance( ) {
 		if ( ! isset( self::$instance ) ) {
 			self::$instance = new BadgeOS_Activity_Progress_Shortcode;
-			self::$instance->setup_shortcodes();
+			self::$instance->setup_actions();
 		}
 
 		return self::$instance;
@@ -46,15 +46,69 @@ class BadgeOS_Activity_Progress_Shortcode {
 
 
 	/**
-	 * Setup the short codes to be used in templates
+	 * Setup the actions
 	 *
 	 * @since BadgeOS_Activity_Progress_Shortcode (1.0.0)
 	 * @access private
 	 *
-	 * @uses add_shortcode() to add various shortcodes
+	 * @uses add_action() to add various actions
 	 */
-	private function setup_shortcodes() {
-		add_shortcode( 'badgeos_activity_progress', array( $this, 'shortcode' ) );
+	private function setup_actions() {
+		add_action( 'init', array( $this, 'register_badgeos_shortcodes' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'admin_scripts' ), 99 );
+	}
+
+	/**
+	 * Enqueue and localize relevant admin_scripts.
+	 *
+	 * @since  1.0.0
+	 */
+	public function admin_scripts() {
+		$directory_url  = plugin_dir_url( dirname( __FILE__ ) );
+		wp_enqueue_script( 'activity-progress-shortcode-embed', $directory_url . "js/activity-progress-shortcode-embed.js", array( 'jquery', 'badgeos-select2' ), '', true );
+	}
+
+	public function register_badgeos_shortcodes() {
+
+		// Setup a custom array of achievement types
+		$achievement_types = array_diff( badgeos_get_achievement_types_slugs(), array( 'step' ) );
+		array_unshift( $achievement_types, 'all' );
+
+		badgeos_register_shortcode( array(
+			'name'            => __( 'Activity Progress Bar', 'badgeos-activity-progress' ),
+			'slug'            => 'badgeos_activity_progress',
+			'description'     => 'Show a progress bar for the users current activity points in relation to the next achievement earnable by points .',
+			'output_callback' => array( $this, 'shortcode' ),
+			'attributes'      => array(
+				'type' => array(
+					'name'        => __( 'Achievement Type(s)', 'badgeos-activity-progress' ),
+					'description' => __( 'Single, or comma-separated list of, achievement type(s) to show progress bar for.', 'badgeos-activity-progress' ),
+					'type'        => 'text',
+					'values'      => $achievement_types,
+					'default'     => 'all',
+				),
+				'user_id' => array(
+					'name'        => __( 'User ID', 'badgeos-activity-progress' ),
+					'description' => __( 'Show progress bar for specific user (defaults to current logged in user).', 'badgeos-activity-progress' ),
+					'type'        => 'text',
+				),
+				'link_to' => array(
+					'name'        => __( 'Link', 'badgeos-activity-progress' ),
+					'description' => __( 'Enter URL to link progress bar to.', 'badgeos-activity-progress' ),
+					'type'        => 'url',
+				),
+				'format' => array(
+					'name'        => __( 'Format', 'badgeos-activity-progress' ),
+					'description' => __( 'Output format.', 'badgeos-activity-progress' ),
+					'type'        => 'select',
+					'values'      => array(
+						'simple'  => __( 'Simple', 'badgeos-activity-progress' ),
+						'extended' => __( 'Extended', 'badgeos-activity-progress' )
+						),
+					'default'     => 'simple',
+				),
+			),
+		) );
 	}
 
 	function get_level_info($user_points, $achievement_type) {
@@ -94,14 +148,17 @@ class BadgeOS_Activity_Progress_Shortcode {
     public function shortcode($atts) {
 
         $atts = shortcode_atts( array(
-            'achievement_type'	=> badgeos_get_achievement_types_slugs(),    // achievement type to show progress for
-			'format'			=> 'simple',	// output format, possible values: 'simple', 'extended'
-			'user'				=> 0,
-			'link_to'			=> false,
+            'type'		=> 'all',    // achievement type to show progress for
+			'format'	=> 'simple',	// output format, possible values: 'simple', 'extended'
+			'user_id'	=> 0,
+			'link_to'	=> false,
         ), $atts );
 
-		$points = absint(badgeos_get_users_points($atts['user']));
-		$level = $this->get_level_info($points, $atts['achievement_type']);
+		if ($atts['type'] == 'all')
+			$atts['type'] = badgeos_get_achievement_types_slugs();
+
+		$points = absint(badgeos_get_users_points($atts['user_id']));
+		$level = $this->get_level_info($points, $atts['type']);
 
 		// no progress bar
 		if (!$level['next_points'])
