@@ -1,6 +1,6 @@
 <?php
 /**
- * Version: 0.0.1
+ * Version: 1.0.0
  * Author: Konnektiv
  * Author URI: http://konnektiv.de/
  */
@@ -21,7 +21,7 @@ class BadgeOS_Activity_Progress_Shortcode {
 	 * Insures that only one instance of BadgeOS_Activity_Progress_Shortcode exists in memory at
 	 * any one time. Also prevents needing to define globals all over the place.
 	 *
-	 * @since BadgeOS_Activity_Progress_Shortcode (0.0.1)
+	 * @since BadgeOS_Activity_Progress_Shortcode (1.0.0)
 	 *
 	 * @staticvar array $instance
 	 *
@@ -39,7 +39,7 @@ class BadgeOS_Activity_Progress_Shortcode {
 	/**
 	 * A dummy constructor to prevent loading more than one instance
 	 *
-	 * @since BadgeOS_Activity_Progress_Shortcode (0.0.1)
+	 * @since BadgeOS_Activity_Progress_Shortcode (1.0.0)
 	 */
 	private function __construct() { /* Do nothing here */
 	}
@@ -48,7 +48,7 @@ class BadgeOS_Activity_Progress_Shortcode {
 	/**
 	 * Setup the short codes to be used in templates
 	 *
-	 * @since BadgeOS_Activity_Progress_Shortcode (0.0.1)
+	 * @since BadgeOS_Activity_Progress_Shortcode (1.0.0)
 	 * @access private
 	 *
 	 * @uses add_shortcode() to add various shortcodes
@@ -156,7 +156,7 @@ class BadgeOS_Activity_Progress_Shortcode {
 	 * @param $gradient - custom gradient value, in decimals (default: null)
 	 * @param $gradient_end gradient end color, based on the endcolor parameter or $gradient (default: null)
 	 * @author Chris Reynolds
-	 * @since 2.0
+	 * @since 1.0.0
 	 */
 	function wppb_get_progress_bar($location = false, $text = false, $progress, $option = false, $width, $fullwidth = false, $title = null, $color = false, $gradient = false, $gradient_end = false) {
 		/**

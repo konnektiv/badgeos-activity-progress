@@ -5,7 +5,7 @@
  * Description: Adds a shortcode to show a progress bar for the users current activity points.
  * Tags: buddypress
  * Author: konnektiv
- * Version: 0.0.1
+ * Version: 1.0.0
  * Author URI: https://konnektiv.de/
  * License: GNU AGPL
  * Text Domain: badgeos-activity-progress
@@ -52,7 +52,7 @@ class BadgeOS_Activity_Progress {
 	/**
 	 * Files to include for BadgeOS integration.
 	 *
-	 * @since  1.1.1
+	 * @since  1.0.0
 	 */
 	public function includes() {
 		if ( $this->meets_requirements() ) {
@@ -85,7 +85,7 @@ class BadgeOS_Activity_Progress {
 	/**
 	 * Check if BadgeOS is available
 	 *
-	 * @since  0.0.1
+	 * @since  1.0.0
 	 * @return bool True if BadgeOS is available, false otherwise
 	 */
 	public static function meets_requirements() {
