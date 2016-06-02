@@ -30,6 +30,7 @@ class BadgeOS_Activity_Progress_Shortcode {
 	public static function instance( ) {
 		if ( ! isset( self::$instance ) ) {
 			self::$instance = new BadgeOS_Activity_Progress_Shortcode;
+			self::$instance->setup_globals();
 			self::$instance->setup_actions();
 		}
 
@@ -44,6 +45,16 @@ class BadgeOS_Activity_Progress_Shortcode {
 	private function __construct() { /* Do nothing here */
 	}
 
+	/**
+	 * Setup globals
+	 *
+	 * @since BadgeOS_Activity_Progress_Shortcode (1.0.0)
+	 * @access private
+	 *
+	 */
+	private function setup_globals() {
+		$this->directory_url  = plugin_dir_url( dirname( __FILE__ ) );
+	}
 
 	/**
 	 * Setup the actions
@@ -56,6 +67,16 @@ class BadgeOS_Activity_Progress_Shortcode {
 	private function setup_actions() {
 		add_action( 'init', array( $this, 'register_badgeos_shortcodes' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_scripts' ), 99 );
+		add_action( 'wp_enqueue_scripts', array( $this, 'register_styles' ) );
+	}
+
+	/**
+	 * Register relevant styles.
+	 *
+	 * @since  1.0.0
+	 */
+	public function register_styles() {
+		wp_register_style( 'activity-progress-shortcode', $this->directory_url . 'css/activity-progress-shortcode.css', array(), '1.0.0' );
 	}
 
 	/**
@@ -64,8 +85,7 @@ class BadgeOS_Activity_Progress_Shortcode {
 	 * @since  1.0.0
 	 */
 	public function admin_scripts() {
-		$directory_url  = plugin_dir_url( dirname( __FILE__ ) );
-		wp_enqueue_script( 'activity-progress-shortcode-embed', $directory_url . "js/activity-progress-shortcode-embed.js", array( 'jquery', 'badgeos-select2' ), '', true );
+		wp_enqueue_script( 'activity-progress-shortcode-embed', $this->directory_url . 'js/activity-progress-shortcode-embed.js', array( 'jquery', 'badgeos-select2' ), '', true );
 	}
 
 	public function register_badgeos_shortcodes() {
@@ -164,6 +184,7 @@ class BadgeOS_Activity_Progress_Shortcode {
 		if (!$level['next_points'])
 			return '';
 
+
         $progress = ($points/$level['next_points'] * 100) . "%";
 
 		$output = '';
@@ -174,8 +195,8 @@ class BadgeOS_Activity_Progress_Shortcode {
 		if ($level['current_achievement'])
 			$title = get_the_title( $level['current_achievement'] ) . ": ";
 
-		$output .= $this->wppb_get_progress_bar(false, false, $progress, false, $progress, true,  $title .
-												sprintf(__("%d/%d Points", 'badgeos-activity-progress'), $points, $level['next_points'] ));
+		$output .= $this->wppb_get_progress_bar(false, false, $progress, false, $progress, true,
+												sprintf(__("%s%d/%d Points", 'badgeos-activity-progress'), $title, $points, $level['next_points'] ));
 
 		if ($atts['link_to'])
 			$output .= '</a>';
@@ -195,6 +216,8 @@ class BadgeOS_Activity_Progress_Shortcode {
 			$output .= '<p>' . sprintf(__("Activity points needed for next level: %d", 'badgeos-activity-progress'), $level['next_points'] ) . '</p>';
 			$output .= $progress;
 		}
+
+		wp_enqueue_style( 'activity-progress-shortcode' );
 
 		return $output;
     }
