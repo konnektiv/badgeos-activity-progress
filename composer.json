@@ -1,0 +1,10 @@
+{
+  "name": "konnektiv/badgeos-activity-progress",
+  "description": "This Plugin adds a shortcode to show a progress bar for the users current activity points in relation to the next achievement earnable by points.",
+  "type": "wordpress-plugin",
+  "license": "AGPL-3.0",
+  "require": {
+    "composer/installers": "~1.0",
+    "php": ">=5.2.4"
+  }
+}
