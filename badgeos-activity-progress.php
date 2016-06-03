@@ -56,7 +56,7 @@ class BadgeOS_Activity_Progress {
 	 */
 	public function includes() {
 		if ( $this->meets_requirements() ) {
-			require_once( $this->directory_path . '/includes/activity-progress-shortcode-class.php' );
+			require_once $this->directory_path . '/includes/activity-progress-shortcode-class.php';
 		}
 	}
 
@@ -90,7 +90,7 @@ class BadgeOS_Activity_Progress {
 	 */
 	public static function meets_requirements() {
 
-		if ( class_exists('BadgeOS') && version_compare( BadgeOS::$version, '1.4.0', '>=' ) ) {
+		if ( class_exists( 'BadgeOS' ) && version_compare( BadgeOS::$version, '1.4.0', '>=' ) ) {
 			return true;
 		} else {
 			return false;
