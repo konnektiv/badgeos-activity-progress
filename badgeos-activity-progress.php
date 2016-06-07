@@ -1,9 +1,8 @@
 <?php
 /**
  * Plugin Name: BadgeOS Activity Progress
- * Plugin URI: http://www.konnektiv.de/
+ * Plugin URI: https://wordpress.org/plugins/activity-progress-add-on-for-badgeos/
  * Description: Adds a shortcode to show a progress bar for the users current activity points.
- * Tags: buddypress
  * Author: konnektiv
  * Version: 1.0.0
  * Author URI: https://konnektiv.de/
@@ -12,7 +11,7 @@
  */
 
 /*
- * Copyright © 2012-2013 LearningTimes, LLC
+ * Copyright © 2016 Konnektiv, Christoph Herbst
  *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Affero General Public License, version 3,
